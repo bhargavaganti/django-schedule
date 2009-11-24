@@ -14,7 +14,7 @@ urlpatterns = patterns('',
 # urls for Calendars
 url(r'^calendar/$',
     object_list,
-    name="schedule",
+    name="sh-index",
     kwargs={'queryset':Calendar.objects.all(), 'template_name':'schedule/calendar_list.html'}),
 
 url(r'^calendar/year/(?P<calendar_slug>[-\w]+)/$',

@@ -14,7 +14,7 @@ class EventListManager(object):
     def __init__(self, events):
         self.events = events
 
-    def occurrences_after(self, after=None):
+    def occurrences_after(self, after=None, amount=0):
         """
         It is often useful to know what the next occurrence is given a list of
         events.  This function produces a generator that yields the
@@ -35,8 +35,12 @@ class EventListManager(object):
             except StopIteration:
                 pass
 
+        if amount == 0:    
+            amount = 100000
         while True:
-            if len(occurrences) == 0: raise StopIteration
+            amount = amount -1
+            if len(occurrences) == 0 or amount < 0: 
+                raise StopIteration
 
             generator=occurrences[0][1]
 
@@ -45,7 +49,6 @@ class EventListManager(object):
             except StopIteration:
                 next = heapq.heappop(occurrences)[0]
             yield occ_replacer.get_occurrence(next)
-
 
 class OccurrenceReplacer(object):
     """
