@@ -48,7 +48,7 @@ class Event(models.Model):
         }
 
     def get_absolute_url(self):
-        return reverse('event', args=[self.id])
+        return reverse('event', args=[self.id, self.calendar.slug])
 
     def create_relation(self, obj, distinction = None):
         """
@@ -388,6 +388,7 @@ class Occurrence(models.Model):
             return reverse('occurrence', kwargs={'occurrence_id': self.pk,
                 'event_id': self.event.id})
         return reverse('occurrence_by_date', kwargs={
+            'calendar_slug': self.event.calendar.slug,    
             'event_id': self.event.id,
             'year': self.start.year,
             'month': self.start.month,
@@ -402,6 +403,7 @@ class Occurrence(models.Model):
             return reverse('cancel_occurrence', kwargs={'occurrence_id': self.pk,
                 'event_id': self.event.id})
         return reverse('cancel_occurrence_by_date', kwargs={
+            'calendar_slug': self.event.calendar.slug,    
             'event_id': self.event.id,
             'year': self.start.year,
             'month': self.start.month,
@@ -416,6 +418,7 @@ class Occurrence(models.Model):
             return reverse('edit_occurrence', kwargs={'occurrence_id': self.pk,
                 'event_id': self.event.id})
         return reverse('edit_occurrence_by_date', kwargs={
+            'calendar_slug': self.event.calendar.slug,    
             'event_id': self.event.id,
             'year': self.start.year,
             'month': self.start.month,

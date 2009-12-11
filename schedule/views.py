@@ -111,7 +111,7 @@ def event(request, event_id, template_name="schedule/event.html"):
         "back_url" : back_url,
     }, context_instance=RequestContext(request))
 
-def occurrence(request, event_id,
+def occurrence(request, calendar_slug, event_id, 
     template_name="schedule/occurrence.html", *args, **kwargs):
     """
     This view is used to display an occurrence.
