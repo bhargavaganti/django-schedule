@@ -1,13 +1,42 @@
 import datetime
+import operator
+from datetime import timedelta
 from django.conf import settings
 from django import template
 from django.core.urlresolvers import reverse
 from django.utils.dateformat import format
 from schedule.conf.settings import CHECK_PERMISSION_FUNC
 from schedule.models import Calendar
-from schedule.periods import weekday_names, weekday_abbrs,  Month
+from schedule.periods import weekday_names, weekday_abbrs, Period
 
 register = template.Library()
+
+@register.inclusion_tag("schedule/_event_list.html",  takes_context=True)
+def next_events(context, length=5, calendar=None, days=120 ):
+    '''Inserts a list of the next five event occurrences from right now for a given calendar. 
+
+       Optionally, a length can be passed for a certain number of events to be returned.
+       The calendar can also be 'None' to pull events from all calendars.
+       The tag also takes a number of days for the period.
+
+       The returned context is a list of events and is rendered using the _event_list.html template.
+       '''
+    if not calendar:
+        events = []
+        cals = Calendar.objects.all()
+        while len(events) < length:
+            for c in cals:
+                period = Period(events=c.events, start=datetime.datetime.now(), end=(datetime.datetime.now()+timedelta(days=days)))
+                for occ in period.get_occurrences():
+                    events.append(occ)
+        events.sort(lambda x, y: cmp(x.start, y.start))
+        context['events'] = events[0:length]
+    else:
+        period = Period(events=calendar.events, start=datetime.datetime.now(), end=(datetime.datetime.now()+timedelta(days=364)))
+        context['events'] = period.get_occurrences()[0:length]
+    context['today'] = datetime.datetime.now().date()
+    return context
+
 
 @register.inclusion_tag("schedule/_month_table.html",  takes_context=True)
 def month_table(context,  calendar, month, size="regular", shift=None):

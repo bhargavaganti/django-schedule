@@ -137,7 +137,7 @@ def occurrence(request, calendar_slug, event_id,
 
 
 @check_event_permissions
-def edit_occurrence(request, event_id,
+def edit_occurrence(request, calendar_slug, event_id,
     template_name="schedule/edit_occurrence.html", *args, **kwargs):
     event, occurrence = get_occurrence(event_id, *args, **kwargs)
     next = kwargs.get('next', None)
@@ -157,7 +157,7 @@ def edit_occurrence(request, event_id,
 
 
 @check_event_permissions
-def cancel_occurrence(request, event_id,
+def cancel_occurrence(request, calendar_slug, event_id,
     template_name='schedule/cancel_occurrence.html', *args, **kwargs):
     """
     This view is used to cancel an occurrence. If it is called with a POST it
