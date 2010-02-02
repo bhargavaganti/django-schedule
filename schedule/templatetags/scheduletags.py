@@ -194,6 +194,39 @@ def do_get_or_create_calendar_for_object(parser, token):
 register.tag('get_calendar', do_get_calendar_for_object)
 register.tag('get_or_create_calendar', do_get_or_create_calendar_for_object)
 
+def do_get_next_events(parser, token):
+    ''' Example usage: {% get_next_events 5 from "holidays" as events %} '''  
+    
+    bits = token.contents.split()
+    if len(bits) != 6:
+        raise template.TemplateSyntaxError, "get_next_events takes exactly five arguments"
+    if bits[2] != 'from':
+        raise template.TemplateSyntaxError, "second argument to the get_next_events tag must be 'from'"
+    if bits[4] != 'as':
+        raise template.TemplateSyntaxError, "second argument to the get_next_events tag must be 'as'"
+    return GetNextEventsNode(bits[1], bits[3], bits[5])
+    
+class GetNextEventsNode(template.Node):
+    def __init__(self, length, calendar, varname):
+        self.length, self.varname = int(length), varname
+        self.calendar = template.Variable(calendar)
+
+    def render(self, context):
+        try:
+            true_cal = self.calendar.resolve(context)
+            if type(true_cal) != Calendar:
+                true_cal = Calendar.objects.get(slug=true_cal)
+            period = Period(events=true_cal.events, start=datetime.datetime.now(), end=(datetime.datetime.now()+datetime.timedelta(days=365)))
+            context[self.varname] = period.get_occurrences()[0:self.length]
+        except template.VariableDoesNotExist:
+            context[self.varname] = ''
+        return ''
+            
+            
+register.tag("get_next_events", do_get_next_events)
+                
+
+
 @register.simple_tag
 def querystring_for_date(date, num=6):
     query_string = '?'
