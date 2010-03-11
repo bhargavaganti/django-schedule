@@ -38,6 +38,7 @@ class Event(models.Model):
         verbose_name = _('event')
         verbose_name_plural = _('events')
         app_label = 'schedule'
+	get_latest_by = 'start' 
 
     def __unicode__(self):
         date_format = u'l, %s' % ugettext("DATE_FORMAT")
