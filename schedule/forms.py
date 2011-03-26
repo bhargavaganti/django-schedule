@@ -32,3 +32,21 @@ class OccurrenceForm(SpanForm):
     class Meta:
         model = Occurrence
         exclude = ('original_start', 'original_end', 'event', 'cancelled')
+
+
+class RuleForm(forms.ModelForm):
+    params = forms.CharField(widget=forms.Textarea, help_text=_("Extra parameters to define this type of recursion. Should follow this format: rruleparam:value;otherparam:value."))
+
+    def clean_params(self):
+        params = self.cleaned_data["params"]
+        try:
+            params = params.split(';')
+            for param in params:
+                param = param.split(':')
+                if len(param) == 2:
+                    param = (str(param[0]), [int(p) for p in param[1].split(',')])
+                    if len(param[1]) == 1:
+                        param = (param[0], param[1][0])
+        except ValueError:
+            raise forms.ValidationError(_("Params format looks invalide"))
+        return self.cleaned_data["params"]
